@@ -852,12 +852,12 @@ void Compiler::code(string op, string operand1, string operand2) {
    }
 }
 
-void Compiler::pushOperator(string name) { // Push name onto opertorStk
+void Compiler::pushOperator(string name) { // Push name onto opertorStk //done
 	// push name onto stack;
 	operatorStk.push(name);
 }
 
-string Compiler::popOperator() { // pop name from operandStk
+string Compiler::popOperator() { // pop name from operandStk //done
 string temp;
 	// if operatorStk is not empty
 	// return top element removed from stack;
@@ -874,21 +874,22 @@ string temp;
    return temp;
 }
 
-void Compiler::pushOperand(string operand) { // Push name onto operandStk
+void Compiler::pushOperand(string operand) { // Push name onto operandStk //done
 	//if name is a literal, also create a symbol table entry for it
 
  // if name is a literal and has no symbol table entry
  // insert symbol table entry, call whichType to determine the data type of the literal
  // push name onto stack;
 	if (symbolTable.count(operand) == 0) {
-		if (isInteger(operand) || operand == "true" || operand == "false")
+		if (isInteger(operand) || operand == "true" || operand == "false") {
 			insert(operand, whichType(operand), modes::CONSTANT, whichValue(operand), allocation::YES, 1);
+      }
 	}
 
 	operandStk.push(operand);
 }
 
-string Compiler::popOperand() { //pop name from operandStk
+string Compiler::popOperand() { //pop name from operandStk //done
 	string temp;
 	// if operandStk is not empty
 	// return top element removed from stack;
@@ -896,9 +897,10 @@ string Compiler::popOperand() { //pop name from operandStk
 	// processError(compiler error; operand stack underflow)
 	if (!operandStk.empty()) {
 		temp = operandStk.top();
-		operandStk.pop();
-		
-	}else {
+		operandStk.pop();	
+	}
+   else 
+   {
 	processError("operand stack underflow");
    }
    return temp;
