@@ -115,7 +115,7 @@ void Compiler::progStmt() {
 
 // stage 0 production 3
 
-void Compiler::consts() {
+void Compiler::consts() { //done
 	if (token != "const")
 	{
 		processError("keyword \"const\" expected");
@@ -129,7 +129,7 @@ void Compiler::consts() {
 
 // stage 0 production 4
 
-void Compiler::vars() {
+void Compiler::vars() { //done
 	if (token != "var")
 	{
 		processError("keyword \"var\" expected");
@@ -143,9 +143,11 @@ void Compiler::vars() {
 
 // stage 0 production 5
 
-void Compiler::beginEndStmt() {
+void Compiler::beginEndStmt() { //done
 	if (token != "begin")
+	{
 		processError("keyword \"begin\" expected");
+	}
 
 	// change as of stage 1
 	nextToken();
@@ -154,7 +156,9 @@ void Compiler::beginEndStmt() {
 	}
 	
 	if (token != "end")
+	{
 		processError("keyword \"end\" expected");
+	}
 	if (nextToken() != ".")
 		processError("period expected");
 	nextToken();
@@ -163,68 +167,81 @@ void Compiler::beginEndStmt() {
 
 // stage 0 production 6
 
-void Compiler::constStmts() {
+void Compiler::constStmts() { //done
 	string x, y;
 
-	if (!isNonKeyId(token)){
+	if (!isNonKeyId(token))
+	{
 		processError("non-keyword identifier expected");
-   }
+   	}
 	x = token;	// x has the constant's name
 
 	// check for format x = y;
-	if (nextToken() != "="){
+	if (nextToken() != "=")
+	{
 		processError("\"=\" expected");
-   }
+   	}
 	y = nextToken();	// y has the value of that constant
 
 	// if y is not one of "+","-","not",NON_KEY_ID,"true","false",INTEGER
-	if (y != "+" && y != "-" && y != "not" && !isNonKeyId(y) && !isBoolean(y) && !isInteger(y)){	// y is not a number, true-false or a non-key ID
+	if (y != "+" && y != "-" && y != "not" && !isNonKeyId(y) && !isBoolean(y) && !isInteger(y))	// y is not a number, true-false or a non-key ID
+	{
 		processError("token to right of \"=\" illegal");
-   }
-	if (y == "+" || y == "-"){
+   	}
+	if (y == "+" || y == "-")
+	{
 		if (!isInteger(nextToken()))
+		{
 			processError("integer expected after sign");
-
+		}
 		y += token;
 	}
 
-	if (y == "not"){
-		if (!isBoolean(nextToken())){	// if after not isn't "true" or "false"
+	if (y == "not")
+	{
+		if (!isBoolean(nextToken()))	// if after not isn't "true" or "false"
+		{
 			processError("boolean expected after \"not\"");
-      }
-		if (token == "true"){
+      		}
+		if (token == "true")
+		{
 			y = "false";
-      }
-		else{
+    	 	}
+		else
+		{
 			y = "true";
-      }
+      		}
 	}
 
 
 
 	// check for format: x = y;
-	if (nextToken() != ";"){
+	if (nextToken() != ";")
+	{
 		processError("semicolon expected");
-   }
-	if (whichType(y) != INTEGER && whichType(y) != BOOLEAN){
+  	}
+	if (whichType(y) != INTEGER && whichType(y) != BOOLEAN)
+	{
 		processError("data type of token on the right-hand side must be INTEGER or BOOLEAN");
-   }
+   	}
 	insert(x, whichType(y), CONSTANT, whichValue(y), YES, 1);
 	x = nextToken();
 
 	// if after a constant declaration is another non_key_id or "var" or "begin"
-	if (x != "begin" && x != "var" && !isNonKeyId(x)){
+	if (x != "begin" && x != "var" && !isNonKeyId(x))
+	{
 		processError("non-keyword identifier, \"begin\", or \"var\" expected");
-   }
-	if (isNonKeyId(x)){
+   	}
+	if (isNonKeyId(x))
+	{
 		constStmts();	// call it again to insert another constant
-   }
+   	}
  
 }
 
 // stage 0 production 7
 
-void Compiler::varStmts() {
+void Compiler::varStmts() { //done
   
 	string x,y;
 	if (!isNonKeyId(token))
@@ -248,7 +265,9 @@ void Compiler::varStmts() {
 		processError("semicolon expected");
 	}
 	if (y == "integer") insert(x, storeTypes::INTEGER, modes::VARIABLE, "1", allocation::YES, 1);
+	{}
 	else insert(x, storeTypes::BOOLEAN, modes::VARIABLE, "1", allocation::YES, 1);
+	{}
 	if (nextToken() != "begin"&& !isNonKeyId(token))
 	{
 		processError("non-keyword identifier or \"begin\" expected");
@@ -262,7 +281,7 @@ void Compiler::varStmts() {
 
 
 // stage 0 production 8
-string Compiler::ids() {
+string Compiler::ids() { //done
 	//token should be NON_KEY_ID
    string temp,tempString;
 	if(!isNonKeyId(token))
@@ -297,190 +316,244 @@ void Compiler::execStmts(){       // stage 1, production 2
    
 }
 
-void Compiler::execStmt() {       // stage 1, production 3
-   if (isNonKeyId(token)){
+void Compiler::execStmt() {       // stage 1, production 3 //done
+   	if (isNonKeyId(token))
+   	{
 		assignStmt();
 	}
 	else if (token == "read")
 	{
 		readStmt();
 	}
-	else if (token == "write") {
+	else if (token == "write") 
+	{
 		writeStmt();
 	}
-   else processError("non-keyword id, \"read\", or \"write\" expected");
+   else 
+   {
+	   processError("non-keyword id, \"read\", or \"write\" expected");
+   }
 }
 
-void Compiler::assignStmt() {     // stage 1, production 4
+void Compiler::assignStmt() {     // stage 1, production 4 //done
 	string secondOperand, firstOperand;
 	if (!isNonKeyId(token))
+	{
 		processError("non - keyword identifier expected");
-
+	}
 	//Token must be already defined
 	if (symbolTable.count(token) == 0) processError("reference to undefined variable");
-
+	{
 	pushOperand(token);
 	nextToken();
-
-	if (token != ":=") processError("':=' expected; found " + token);
-	else pushOperator(":=");
-
+	}
+	if (token != ":=") 
+	{
+		processError("':=' expected; found " + token);
+	}
+	else 
+	{
+		pushOperator(":=");
+	}
 	nextToken();
 
 	if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+"
 		&& token != "-" && !isInteger(token) && !isNonKeyId(token) && token != ";")
+	{
 		processError("one of \"*\", \"and\", \"div\", \"mod\", \")\", \"+\", \"-\", \";\", \"<\", \"<=\", \"<>\", \"=\", \">\", \">=\", or \"or\" expected");
-	else express();
-
+	}
+	else 
+	{
+		express();
+	}
 	secondOperand = popOperand();
 	firstOperand = popOperand();
 	code(popOperator(), secondOperand, firstOperand);
 }
 
-void Compiler::readStmt() {       // stage 1, production 5
+void Compiler::readStmt() {       // stage 1, production 5 //done
 	string x = "";
-	if (nextToken() != "(") {
+	if (nextToken() != "(") 
+	{
 		processError("'(' expected");
 	}
 
 	nextToken();
 	string readList = ids();
 
-	for (unsigned int i = 0; i < readList.length(); i++) {
-		if (readList[i] == ',') {
+	for (unsigned int i = 0; i < readList.length(); i++) 
+	{
+		if (readList[i] == ',') 
+		{
 			code("read", x);
 			x = "";
 		}
-		else {
+		else 
+		{
 			x += readList[i];
 		}
 	}
 	code("read", x);
 
-	if (token != ")") {
+	if (token != ")") 
+	{
 		processError("',' or ')' expected after non-keyword identifier");
 	}
-	if (nextToken() != ";") {
+	if (nextToken() != ";") 
+	{
 		processError("';' expected");
 	}
 }
 
-void Compiler::writeStmt() {      // stage 1, production 7
+void Compiler::writeStmt() {      // stage 1, production 7 //done
 	string x = "";
-	if (nextToken() != "(") {
+	if (nextToken() != "(") 
+	{
 		processError("'(' expected");
 	}
 
 	nextToken();
 	string writeList = ids();
 
-	for (unsigned int i = 0; i < writeList.length(); i++) {
-		if (writeList[i] == ',') {
+	for (unsigned int i = 0; i < writeList.length(); i++) 
+	{
+		if (writeList[i] == ',') 
+		{
 			code("write", x);
 			x = "";
 		}
-		else {
+		else 
+		{
 			x += writeList[i];
 		}
 	}
 	code("write", x);
 
-	if (token != ")") {
+	if (token != ")") 
+	{
 		processError("',' or ')' expected after non-keyword identifier");
 	}
-	if (nextToken() != ";") {
+	if (nextToken() != ";") 
+	{
 		processError("';' expected");
 	}
 }
 
-void Compiler::express() {        // stage 1, production 9
-	if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+" && token != "-" && !isInteger(token) && !isNonKeyId(token)){
+void Compiler::express() {        // stage 1, production 9 //done
+	if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+" && token != "-" && !isInteger(token) && !isNonKeyId(token))
+	{
 		processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", non - keyword identifier or integer expected");
-   }
+   	}
 	term();
 
-	if (token == "<>" || token == "=" || token == "<=" || token == ">=" || token == "<" || token == ">"){
+	if (token == "<>" || token == "=" || token == "<=" || token == ">=" || token == "<" || token == ">")
+	{
 		expresses();
-   }
+   	}
 }
 
-void Compiler::expresses() {      // stage 1, production 10
+void Compiler::expresses() {      // stage 1, production 10 //done
 	string x = "";
 	string operand1, operand2;
 	if (token != "=" && token != "<>" && token != "<=" && token != ">=" && token != "<" && token != ">")
+	{
 		processError("\"=\", \"<>\", \"<=\", \">=\", \"<\", or \">\" expected");
-
+	}
 	pushOperator(token);
 	nextToken();
 
 	if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+"
 		&& token != "-" && !isInteger(token) && !isNonKeyId(token))
+	{
 		processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, or non - keyword identifier expected");
-	else term();
-
+	}
+	else 
+	{
+		term();
+	}
 	operand1 = popOperand();
 	operand2 = popOperand();
 
 	code(popOperator(), operand1, operand2);
 
 	if (token == "<>" || token == "=" || token == "<=" || token == ">=" || token == "<" || token == ">")
+	{
 		expresses();
+	}
 }
 
-void Compiler::term() {           // stage 1, production 11
+void Compiler::term() {           // stage 1, production 11 //done
 	if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+"
 		&& token != "-" && !isInteger(token) && !isNonKeyId(token))
+	{
 		processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, or non - keyword identifier expected");
-
+	}
 	factor();
 
-	if (token == "-" || token == "+" || token == "or") terms();
+	if (token == "-" || token == "+" || token == "or")
+	{
+		terms();
+	}
 }
 
-void Compiler::terms() {          // stage 1, production 12
+void Compiler::terms() {          // stage 1, production 12 //done
 	string x = "";
 	string operand1, operand2;
 
 	if (token != "+" && token != "-" && token != "or")
+	{
 		processError("\"+\", \"-\", or \"or\" expected");
-
+	}
 	pushOperator(token);
 	nextToken();
 
 	if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+"
 		&& token != "-" && !isInteger(token) && !isNonKeyId(token))
+	{
 		processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, or non - keyword identifier expected");
-	else factor();
-
+	}
+	else
+	{
+		factor();
+	}
 	operand1 = popOperand();
 	operand2 = popOperand();
 	code(popOperator(), operand1, operand2);
 
-	if (token == "+" || token == "-" || token == "or") terms();
+	if (token == "+" || token == "-" || token == "or")
+	{
+		terms();
+	}
 }
 
-void Compiler::factor() {         // stage 1, production 13
+void Compiler::factor() {         // stage 1, production 13 //done
 	if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+"
 		&& token != "-" && !isInteger(token) && !isNonKeyId(token))
+	{
 		processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, or non - keyword identifier expected");
+	}
 
 	part();
 
 	if (token == "*" || token == "div" || token == "mod" || token == "and")
+	{
 		factors();
-
-	else if (token == "=" || token == "<>" || token == "<=" || token == ">=" || token == "<" || token == ">" ||
+	}
+	else if (token == "=" || token == "<>" || token == "<=" || token == ">=" || token == "<" || token == ">" ||  //?????????
 		token == ")" || token == ";" || token == "-" || token == "+" || token == "or" || token == "begin");
-	else processError("invalid expression");
+	else
+	{
+		processError("invalid expression");
+	}
 }
 
 void Compiler::factors() {        // stage 1, production 14 //done
 	string x = "";
 	string operand1, operand2;
 	if (token != "*" && token != "div" && token != "and" && token != "mod")
-   {
+   	{
 		processError("\"*\", \"div\", \"mod\", or \"and\" expected");
-   }
+   	}
 	pushOperator(token);
 	nextToken();
 
@@ -488,46 +561,57 @@ void Compiler::factors() {        // stage 1, production 14 //done
 	{  
 		processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, or non - keyword identifier expected");
 	}
-   else part();
-
+   else
+   {
+	   part();
+   }
 	operand1 = popOperand();
 	operand2 = popOperand();
 	code(popOperator(), operand1, operand2);
 	if (token == "*" || token == "div" || token == "mod" || token == "and")
-   {
+  	{
 		factors();
-   }
+   	}
 }
 
-void Compiler::part() {           // stage 1, production 15
+void Compiler::part() {           // stage 1, production 15 //done
 	string x = "";
 	if (token == "not")
 	{
 		nextToken();
-		if (token == "(") {
+		if (token == "(") 
+		{
 			nextToken();
 			if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+"
 				&& token != "-" && !isInteger(token) && !isNonKeyId(token))
+			{
 				processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, or non - keyword identifier expected");
+			}
 			express();
 			if (token != ")")
+			{
 				processError(") expected; found " + token);
+			}
 			nextToken();
 			code("not", popOperand());
 		}
 
-		else if (isBoolean(token)) {
-			if (token == "true") {
+		else if (isBoolean(token)) 
+		{
+			if (token == "true") 
+			{
 				pushOperand("false");
 				nextToken();
 			}
-			else {
+			else 
+			{
 				pushOperand("true");
 				nextToken();
 			}
 		}
 
-		else if (isNonKeyId(token)) {
+		else if (isNonKeyId(token)) 
+		{
 			code("not", token);
 			nextToken();
 		}
@@ -536,68 +620,94 @@ void Compiler::part() {           // stage 1, production 15
 	else if (token == "+")
 	{
 		nextToken();
-		if (token == "(") {
+		if (token == "(") 
+		{
 			nextToken();
 			if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+"
 				&& token != "-" && !isInteger(token) && !isNonKeyId(token))
+			{
 				processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, or non - keyword identifier expected");
+			}
 			express();
-			if (token != ")")
+			if (token != ")") 
+			{
 				processError("expected ')'; found " + token);
+			}
 			nextToken();
 		}
-		else if (isInteger(token) || isNonKeyId(token)) {
+		else if (isInteger(token) || isNonKeyId(token)) 
+		{
 			pushOperand(token);
 			nextToken();
 		}
 
-		else processError("expected '(', integer, or non-keyword id; found " + token);
+		else
+		{
+			processError("expected '(', integer, or non-keyword id; found " + token);
+		}
 	}
 
 	else if (token == "-")
 	{
 		nextToken();
-		if (token == "(") {
+		if (token == "(") 
+		{
 			nextToken();
 			if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+"
 				&& token != "-" && !isInteger(token) && !isNonKeyId(token))
+			{
 				processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, or non - keyword identifier expected");
+			}
 			express();
 			if (token != ")")
+			{
 				processError("expected ')'; found " + token);
+			}
 			nextToken();
 			code("neg", popOperand());
 		}
-		else if (isInteger(token)) {
+		else if (isInteger(token)) 
+		{
 			pushOperand("-" + token);
 			nextToken();
 		}
-		else if (isNonKeyId(token)) {
+		else if (isNonKeyId(token))
+		{
 			code("neg", token);
 			nextToken();
 		}
 	}
 
-	else if (token == "(") {
+	else if (token == "(") 
+	{
 		nextToken();
 		if (token != "not" && token != "true" && token != "false" && token != "(" && token != "+"
 			&& token != "-" && !isInteger(token) && !isNonKeyId(token))
+		{
 			processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, or non - keyword identifier expected");
+		}
 		express();
-		if (token != ")") processError(") expected; found " + token);
+		if (token != ")")
+		{
+			processError(") expected; found " + token);
+		}
 		nextToken();
 	}
 
-	else if (isInteger(token) || isBoolean(token) || isNonKeyId(token)) {
+	else if (isInteger(token) || isBoolean(token) || isNonKeyId(token))
+	{
 		pushOperand(token);
 		nextToken();
 	}
 
-	else processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, boolean, or non - keyword identifier expected");
+	else
+	{
+		processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, boolean, or non - keyword identifier expected");
+	}
 }
 
 // Helper functions
-bool Compiler::isKeyword(string s) const { // determines if s is a keyword
+bool Compiler::isKeyword(string s) const { // determines if s is a keyword //done
 	if (s == "program"
 		|| s == "const"
 		|| s == "var"
@@ -613,7 +723,8 @@ bool Compiler::isKeyword(string s) const { // determines if s is a keyword
 		|| s == "and"
 		|| s == "or"
 		|| s == "read"
-		|| s == "write") {
+		|| s == "write") 
+	{
 		return true;
 	}
 	return false;
@@ -631,7 +742,8 @@ bool Compiler::isSpecialSymbol(char c) const { // determines if c is a special s
 		|| c == '<'
 		|| c == '>'
 		|| c == '('
-		|| c == ')') {
+		|| c == ')') 
+	{
 		return true;
 	}
 	return false;
