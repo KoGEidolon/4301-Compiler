@@ -1858,7 +1858,7 @@ void Compiler::emitGreaterThanOrEqualToCode(string operand1, string operand2) { 
 
 // lexical scanner
 
-char Compiler::nextChar() //returns the next character or end of file marker
+char Compiler::nextChar() //returns the next character or end of file marker //done
 {
 	sourceFile.get(ch);
 
@@ -1872,8 +1872,9 @@ char Compiler::nextChar() //returns the next character or end of file marker
 	else
 	{
 		if (prevChar == '\n')
+      {
 			listingFile << setw(5) << ++lineNo << '|';
-
+      }
 		listingFile << ch;
 	}
 
@@ -1883,7 +1884,7 @@ char Compiler::nextChar() //returns the next character or end of file marker
 
 
 
-string Compiler::nextToken() //returns the next token or end of file marker
+string Compiler::nextToken() //returns the next token or end of file marker //done
 {
 	token = "";
 	
@@ -1895,17 +1896,23 @@ string Compiler::nextToken() //returns the next token or end of file marker
 			{}	// do nothing, just skip the words
 		
 			if (ch == END_OF_FILE)
+         {
 				processError("unexpected end of file");
+         }
 			else
+         {
 				nextChar();
+         }
 		}
 		
 		else if (ch == '}')
+      {
 			processError("'}' cannot begin token");
-		
+      }
 		else if (isspace(ch))
+      {
 			nextChar();
-		
+		}
 		else if (isSpecialSymbol(ch))
 		{
 			token = ch;
@@ -1939,7 +1946,9 @@ string Compiler::nextToken() //returns the next token or end of file marker
 					token += ch;
 			
 			if (ch == END_OF_FILE)
+         {
 				processError("unexpected end of file");
+         }
 		}
 		
 		else if (isdigit(ch))
@@ -1949,17 +1958,23 @@ string Compiler::nextToken() //returns the next token or end of file marker
 			// build up the number or characters
 			while (isdigit(nextChar()) && ch != END_OF_FILE
 				&& !isSpecialSymbol(ch))
+            {
 					token += ch;
-			
+            }
 			if (ch == END_OF_FILE)
+         {
 				processError("unexpected end of file");
+         }
 		}
 		
 		else if (ch == END_OF_FILE)
+      {
 			token = ch;
-		
+		}
 		else
+      {
 			processError("illegal symbol");
+      }
 	}
 	
 	return token;
@@ -1968,21 +1983,23 @@ string Compiler::nextToken() //returns the next token or end of file marker
 
 // Other routines
 
-string Compiler::genInternalName(storeTypes stype) const {
+string Compiler::genInternalName(storeTypes stype) const { //done
 	string internName;
 
 	switch (stype) {
-	case storeTypes::PROG_NAME:
-		internName = "P0";
+	case PROG_NAME:
+   {
+		internalName = "P0";
 		break;
-	case storeTypes::INTEGER:
+   }
+	case INTEGER:
 	{
-		int countNum = 0;
+		int count = 0;
 		for (auto itr : symbolTable) {
-			if (itr.second.getDataType() == storeTypes::INTEGER && itr.first[0] != 'T') ++countNum;
+			if (itr.second.getDataType() == INTEGER && itr.first[0] != 'T') ++count;
 		}
 
-		internName = "I" + to_string(countNum);
+		interalnName = "I" + to_string(count);
 		break;
 	}
 	case storeTypes::BOOLEAN:
@@ -1992,17 +2009,16 @@ string Compiler::genInternalName(storeTypes stype) const {
 			if (itr.second.getDataType() == storeTypes::BOOLEAN) ++countBool;
 		}
 
-		internName = "B" + to_string(countBool);
+		internalName = "B" + to_string(countBool);
 		break;
 	}
-	case storeTypes::UNKNOWN: {}
+	case UNKNOWN: {}
 	}
 
 	return internName;
 }
 
-void Compiler::processError(string err)
-{
+void Compiler::processError(string err) { //dpne
 	++errorCount;
 	listingFile << endl << "Error: Line " << lineNo << ": " << err << endl;
 	createListingTrailer();
@@ -2013,16 +2029,16 @@ void Compiler::processError(string err)
 void Compiler::freeTemp() {
 	currentTempNo--;
 	if (currentTempNo < -1) {
-		processError("compiler error, currentTempNo should be ≥ –1");
+		processError("compiler error, currentTempNo should be = –1");
 	}
 }
 
-string Compiler::getTemp() {
+string Compiler::getTemp() { //done
 	string temp;
 	currentTempNo++;
 	temp = "T" + to_string(currentTempNo);
 	if (currentTempNo > maxTempNo) {
-		insert(temp, storeTypes::UNKNOWN, modes::VARIABLE, "1", allocation::NO, 1);
+		insert(temp, UNKNOWN, VARIABLE, "1", NO, 1);
 		symbolTable.at(temp).setInternalName(temp);
 		maxTempNo++;
 	}
@@ -2030,7 +2046,7 @@ string Compiler::getTemp() {
 	return temp;
 }
 
-string Compiler::getLabel() {
+string Compiler::getLabel() { //done
 	//static local variabes started at -1 then increment by 1 then for temp be equal to .L
 	static int labelNo = -1;
 	string temp;
@@ -2039,7 +2055,13 @@ string Compiler::getLabel() {
 	return temp;
 }
 
-bool Compiler::isTemporary(string s) const { // determines if s represents a temporary
-	if (s[0] == 'T') return true;
-	else return false;
+bool Compiler::isTemporary(string s) const { // determines if s represents a temporary //done
+	if (s[0] == 'T')
+   {      
+      return true;
+   }
+   else 
+   {
+      return false;
+   }
 }
