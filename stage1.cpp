@@ -55,10 +55,11 @@ void Compiler::parser() {
        //
       processError("keyword \"program\" expected");
    }
-   //a call to nextToken() has two effec	// (1) the variable, token, is assigned the value of the next token
+   //a call to nextToken() has two effects	
+   //(1) the variable, token, is assigned the value of the next token
 	// (2) the next token is read from the source file in order to make
 	// the assignment. The value returned by nextToken() is also
-	// the next token.ts
+	// the next token.
 
    prog();
    //parser implements the grammar rules, calling first rule
@@ -103,7 +104,7 @@ void Compiler::prog() {
 
 // stage 0 production 2
 
-void Compiler::progStmt() {
+void Compiler::progStmt() { //token should be "program"
 	string x;
 	if (token != "program")
 	{
@@ -153,20 +154,21 @@ void Compiler::vars() {
 
 // stage 0 production 5
 
-void Compiler::beginEndStmt() {
-	if (token != "begin")
+void Compiler::beginEndStmt() {// change as of stage 1
+	if (token != "begin"){
 		processError("keyword \"begin\" expected");
-
-	// change as of stage 1
+   }
 	nextToken();
 	if (isNonKeyId(token) || token == "read" || token == "write" || token == ";" || token == "begin") {
 		execStmts();
 	}
 	
-	if (token != "end")
+	if (token != "end"){
 		processError("keyword \"end\" expected");
-	if (nextToken() != ".")
+   }
+	if (nextToken() != "."){
 		processError("period expected");
+   }
 	nextToken();
 	code("end", ".");
 }
@@ -2155,8 +2157,8 @@ string Compiler::genInternalName(storeTypes stype) const { //done
 	case INTEGER:
 	{
 		int intCount = 0;
-		for (auto itr : symbolTable) {
-			if (itr.second.getDataType() == INTEGER && itr.first[0] != 'T') ++intCount;
+		for (auto i : symbolTable) {
+			if (i.second.getDataType() == INTEGER && i.first[0] != 'T') ++intCount;
 		}
 
 		internalName = "I" + to_string(intCount);
@@ -2165,8 +2167,8 @@ string Compiler::genInternalName(storeTypes stype) const { //done
 	case BOOLEAN:
 	{
 		int boolCount = 0;
-		for (auto itr : symbolTable) {
-			if (itr.second.getDataType() == BOOLEAN) ++boolCount;
+		for (auto i : symbolTable) {
+			if (i.second.getDataType() == BOOLEAN) ++boolCount;
 		}
 		internalName = "B" + to_string(boolCount);
 		break;
