@@ -1706,7 +1706,7 @@ void Compiler::emitInequalityCode(string operand1, string operand2) {     // op2
 
 	string firstLab = getLabel(), secLab = getLabel();
 
-	if (contentsOfAReg != symbolTable.at(operand2).getInternalName()){
+	if (contentsOfAReg == symbolTable.at(operand2).getInternalName()){
 		emit("", "jne", "." + firstLab, "; if " + operand2 + " <> " + operand1 + " then jump to set eax to TRUE");
    }
 	else{
