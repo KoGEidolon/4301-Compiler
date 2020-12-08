@@ -1113,7 +1113,7 @@ void Compiler::emitReadCode(string operand, string) { //done
 void Compiler::emitWriteCode(string operand, string) { //done
 
    string name;
-	static bool definedStorage = false;
+	static bool defStor = false;
 
 	for (uint i = 0; i < operand.size(); ++i) {
 
@@ -1135,17 +1135,17 @@ void Compiler::emitWriteCode(string operand, string) { //done
          }
 			else {
 				emit("", "cmp", "eax,0", "; compare to 0");
-				string firstLabel = getLabel(), secondLabel = getLabel();
-				emit("", "je", "." + firstLabel, "; jump if equal to print FALSE");
+				string firstLab = getLabel(), secLab = getLabel();
+				emit("", "je", "." + firstLab, "; jump if equal to print FALSE");
 				emit("", "mov", "edx,TRUELIT", "; load address of TRUE literal in edx");
-				emit("", "jmp", "." + secondLabel, "; unconditionally jump to ." + secondLabel);
-				emit("." + firstLabel + ":");
+				emit("", "jmp", "." + secLab, "; unconditionally jump to ." + secLab);
+				emit("." + firstLab + ":");
 				emit("", "mov", "edx,FALSLIT", "; load address of FALSE literal in edx");
-				emit("." + secondLabel + ":");
+				emit("." + secLab + ":");
 				emit("", "call", "WriteString", "; write string to standard out");
 
-				if (definedStorage == false) {
-					definedStorage = true;
+				if (defStor == false) {
+					defStor = true;
 					objectFile << endl;
 					emit("SECTION", ".data");
 					emit("TRUELIT", "db", "'TRUE',0", "; literal string TRUE");
@@ -1172,17 +1172,17 @@ void Compiler::emitWriteCode(string operand, string) { //done
    }
 	else { 
 		emit("", "cmp", "eax,0", "; compare to 0");
-		string firstLabel = getLabel(), secondLabel = getLabel();
-		emit("", "je", "." + firstLabel, "; jump if equal to print FALSE");
+		string firstLab = getLabel(), secLab = getLabel();
+		emit("", "je", "." + firstLab, "; jump if equal to print FALSE");
 		emit("", "mov", "edx,TRUELIT", "; load address of TRUE literal in edx");
-		emit("", "jmp", "." + secondLabel, "; unconditionally jump to ." + secondLabel);
-		emit("." + firstLabel + ":");
+		emit("", "jmp", "." + secLab, "; unconditionally jump to ." + secLab);
+		emit("." + firstLab + ":");
 		emit("", "mov", "edx,FALSLIT", "; load address of FALSE literal in edx");
-		emit("." + secondLabel + ":");
+		emit("." + secLab + ":");
 		emit("", "call", "WriteString", "; write string to standard out");
 
-		if (definedStorage == false) {
-			definedStorage = true;
+		if (defStor == false) {
+			defStor = true;
 			objectFile << endl;
 			emit("SECTION", ".data");
 			emit("TRUELIT", "db", "'TRUE',0", "; literal string TRUE");
@@ -1197,7 +1197,7 @@ void Compiler::emitWriteCode(string operand, string) { //done
 }
 
 void Compiler::emitAssignCode(string operand1, string operand2) { // op2 = op1 //done
-   if (symbolTable.count(operand1) == 0){
+   if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1214,6 +1214,13 @@ void Compiler::emitAssignCode(string operand1, string operand2) { // op2 = op1 /
    }
 	if (symbolTable.at(operand1).getInternalName() != contentsOfAReg){
 		emit("", "mov", "eax,[" + symbolTable.at(operand1).getInternalName() + "]", "; AReg = " + operand1);
+   }else if (operand1 == "true") {
+		emit("", "mov", "eax,[TRUE]", "; AReg = " + operand1);
+		contentsOfAReg = "TRUE";
+   }
+   else if (operand1 == "false") {
+      emit("", "mov", "eax,[FALSE]", "; AReg = " + operand1);
+      contentsOfAReg = "FALSE";
    }
 	emit("", "mov", "[" + symbolTable.at(operand2).getInternalName() + "],eax", "; " + operand2 + " = AReg");
 
@@ -1226,7 +1233,7 @@ void Compiler::emitAssignCode(string operand1, string operand2) { // op2 = op1 /
 
 void Compiler::emitAdditionCode(string operand1, string operand2) { // op2 +  op1 //done
 
-	if (symbolTable.count(operand1) == 0){
+	if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1272,7 +1279,7 @@ void Compiler::emitAdditionCode(string operand1, string operand2) { // op2 +  op
 }
 
 void Compiler::emitSubtractionCode(string operand1, string operand2) {    // op2 -  op1 //done
-   if (symbolTable.count(operand1) == 0){
+   if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1314,7 +1321,7 @@ void Compiler::emitSubtractionCode(string operand1, string operand2) {    // op2
 }
 
 void Compiler::emitMultiplicationCode(string operand1, string operand2) { // op2 *  op1 //done
-   if (symbolTable.count(operand1) == 0){
+   if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1361,7 +1368,7 @@ void Compiler::emitMultiplicationCode(string operand1, string operand2) { // op2
 }
 
 void Compiler::emitDivisionCode(string operand1, string operand2) {        // op2 /  op1 //done
-	if (symbolTable.count(operand1) == 0){
+	if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1399,7 +1406,7 @@ void Compiler::emitDivisionCode(string operand1, string operand2) {        // op
 }
 
 void Compiler::emitModuloCode(string operand1, string operand2) {        // op2 %  op1 //done
-   if (symbolTable.count(operand1) == 0){
+   if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1440,7 +1447,7 @@ void Compiler::emitModuloCode(string operand1, string operand2) {        // op2 
 }
 
 void Compiler::emitNegationCode(string operand1, string) {           // -op1 //done
-   if (symbolTable.count(operand1) == 0){
+   if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	
@@ -1471,7 +1478,7 @@ void Compiler::emitNegationCode(string operand1, string) {           // -op1 //d
 }
 
 void Compiler::emitNotCode(string operand1, string) {                // !op1  //done
-   if (symbolTable.count(operand1) == 0){
+   if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	if (symbolTable.at(operand1).getDataType() != BOOLEAN){
@@ -1502,7 +1509,7 @@ void Compiler::emitNotCode(string operand1, string) {                // !op1  //
 
 void Compiler::emitAndCode(string operand1, string operand2) {       // op2 && op1 //done
 
-	if (symbolTable.count(operand1) == 0){
+	if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1549,7 +1556,7 @@ void Compiler::emitAndCode(string operand1, string operand2) {       // op2 && o
 }
 
 void Compiler::emitOrCode(string operand1, string operand2) {        // op2 || op1 //done
-   if (symbolTable.count(operand1) == 0){
+   if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1597,7 +1604,7 @@ void Compiler::emitOrCode(string operand1, string operand2) {        // op2 || o
 
 void Compiler::emitEqualityCode(string operand1, string operand2) { // op2 == op1 //done
 
-   if (symbolTable.count(operand1) == 0){
+   if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1627,14 +1634,14 @@ void Compiler::emitEqualityCode(string operand1, string operand2) { // op2 == op
 	else{
 		emit("", "cmp", "eax,[" + symbolTable.at(operand2).getInternalName() + "]", "; compare " + operand1 + " and " + operand2);
    }
-	string firstLabel = getLabel(), secondLabel = getLabel();
+	string firstLab = getLabel(), secLab = getLabel();
 
 
 	if (contentsOfAReg == symbolTable.at(operand2).getInternalName()){
-		emit("", "je", "." + firstLabel, "; if " + operand2 + " = " + operand1 + " then jump to set eax to TRUE");
+		emit("", "je", "." + firstLab, "; if " + operand2 + " = " + operand1 + " then jump to set eax to TRUE");
    }
 	else {
-		emit("", "je", "." + firstLabel, "; if " + operand1 + " = " + operand2 + " then jump to set eax to TRUE");
+		emit("", "je", "." + firstLab, "; if " + operand1 + " = " + operand2 + " then jump to set eax to TRUE");
    }
 	emit("", "mov", "eax,[FALSE]", "; else set eax to FALSE");
 
@@ -1642,15 +1649,15 @@ void Compiler::emitEqualityCode(string operand1, string operand2) { // op2 == op
 		insert("false", BOOLEAN, CONSTANT, "0", YES, 1);
 		symbolTable.at("false").setInternalName("FALSE");
 	}
-	emit("", "jmp", "." + secondLabel, "; unconditionally jump");
-	emit("." + firstLabel + ":");
+	emit("", "jmp", "." + secLab, "; unconditionally jump");
+	emit("." + firstLab + ":");
 	emit("", "mov", "eax,[TRUE]", "; set eax to TRUE");
 
 	if (symbolTable.count("true") == 0) {
 		insert("true", BOOLEAN, CONSTANT, "-1", YES, 1);
 		symbolTable.at("true").setInternalName("TRUE");
 	}
-	emit("." + secondLabel + ":");
+	emit("." + secLab + ":");
 
 	if (isTemporary(operand1)) {
 		freeTemp();
@@ -1664,7 +1671,7 @@ void Compiler::emitEqualityCode(string operand1, string operand2) { // op2 == op
 }
 
 void Compiler::emitInequalityCode(string operand1, string operand2) {     // op2 != op1 //done
-   if (symbolTable.count(operand1) == 0){
+   if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1697,13 +1704,13 @@ void Compiler::emitInequalityCode(string operand1, string operand2) {     // op2
 		emit("", "cmp", "eax,[" + symbolTable.at(operand2).getInternalName() + "]", "; compare " + operand1 + " and " + operand2);
    }
 
-	string firstLabel = getLabel(), secondLabel = getLabel();
+	string firstLab = getLabel(), secLab = getLabel();
 
-	if (contentsOfAReg == symbolTable.at(operand2).getInternalName()){
-		emit("", "jne", "." + firstLabel, "; if " + operand2 + " <> " + operand1 + " then jump to set eax to TRUE");
+	if (contentsOfAReg != symbolTable.at(operand2).getInternalName()){
+		emit("", "jne", "." + firstLab, "; if " + operand2 + " <> " + operand1 + " then jump to set eax to TRUE");
    }
 	else{
-		emit("", "jne", "." + firstLabel, "; if " + operand1 + " <> " + operand2 + " then jump to set eax to TRUE");
+		emit("", "jne", "." + firstLab, "; if " + operand1 + " <> " + operand2 + " then jump to set eax to TRUE");
    }
 	emit("", "mov", "eax,[FALSE]", "; else set eax to FALSE");
 
@@ -1711,15 +1718,15 @@ void Compiler::emitInequalityCode(string operand1, string operand2) {     // op2
 		insert("false",BOOLEAN,CONSTANT,"0",YES, 1);
 		symbolTable.at("false").setInternalName("FALSE");
 	}
-	emit("", "jmp", "." + secondLabel, "; unconditionally jump");
-	emit("." + firstLabel + ":");
+	emit("", "jmp", "." + secLab, "; unconditionally jump");
+	emit("." + firstLab + ":");
 	emit("", "mov", "eax,[TRUE]", "; set eax to TRUE");
 
 	if (symbolTable.count("true") == 0) {
 		insert("true",BOOLEAN,CONSTANT,"-1", YES, 1);
 		symbolTable.at("true").setInternalName("TRUE");
 	}
-	emit("." + secondLabel + ":");
+	emit("." + secLab + ":");
 
 	if (isTemporary(operand1)) {
 		freeTemp();
@@ -1733,7 +1740,7 @@ void Compiler::emitInequalityCode(string operand1, string operand2) {     // op2
 }
 
 void Compiler::emitLessThanCode(string operand1, string operand2) {       // op2 <  op1 //done
-   if (symbolTable.count(operand1) == 0){
+   if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1766,13 +1773,13 @@ void Compiler::emitLessThanCode(string operand1, string operand2) {       // op2
 	else{
 		emit("", "cmp", "eax,[" + symbolTable.at(operand2).getInternalName() + "]", "; compare " + operand1 + " and " + operand2);
    }
-	string firstLabel = getLabel(), secondLabel = getLabel();
+	string firstLab = getLabel(), secLab = getLabel();
 
 	if (contentsOfAReg == symbolTable.at(operand2).getInternalName()){
-		emit("", "jl", "." + firstLabel, "; if " + operand2 + " < " + operand1 + " then jump to set eax to TRUE");
+		emit("", "jl", "." + firstLab, "; if " + operand2 + " < " + operand1 + " then jump to set eax to TRUE");
    }
 	else {
-		emit("", "jl", "." + firstLabel, "; if " + operand1 + " < " + operand2 + " then jump to set eax to TRUE");
+		emit("", "jl", "." + firstLab, "; if " + operand1 + " < " + operand2 + " then jump to set eax to TRUE");
    }
 	emit("", "mov", "eax,[FALSE]", "; else set eax to FALSE");
 
@@ -1780,15 +1787,15 @@ void Compiler::emitLessThanCode(string operand1, string operand2) {       // op2
 		insert("false", BOOLEAN, CONSTANT, "0", YES, 1);
 		symbolTable.at("false").setInternalName("FALSE");
 	}
-	emit("", "jmp", "." + secondLabel, "; unconditionally jump");
-	emit("." + firstLabel + ":");
+	emit("", "jmp", "." + secLab, "; unconditionally jump");
+	emit("." + firstLab + ":");
 	emit("", "mov", "eax,[TRUE]", "; set eax to TRUE");
 
 	if (symbolTable.count("true") == 0) {
 		insert("true", BOOLEAN,CONSTANT, "-1", YES, 1);
 		symbolTable.at("true").setInternalName("TRUE");
 	}
-	emit("." + secondLabel + ":");
+	emit("." + secLab + ":");
 
 	if (isTemporary(operand1)) {
 		freeTemp();
@@ -1803,7 +1810,7 @@ void Compiler::emitLessThanCode(string operand1, string operand2) {       // op2
 
 void Compiler::emitLessThanOrEqualToCode(string operand1, string operand2) { // op2 <= op1 //done
 
-	if (symbolTable.count(operand1) == 0){
+	if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1835,13 +1842,13 @@ void Compiler::emitLessThanOrEqualToCode(string operand1, string operand2) { // 
 	else{
 		emit("", "cmp", "eax,[" + symbolTable.at(operand2).getInternalName() + "]", "; compare " + operand1 + " and " + operand2);
    }
-	string firstLabel = getLabel(), secondLabel = getLabel();
+	string firstLab = getLabel(), secLab = getLabel();
 
 	if (contentsOfAReg == symbolTable.at(operand2).getInternalName()){
-		emit("", "jle", "." + firstLabel, "; if " + operand2 + " <= " + operand1 + " then jump to set eax to TRUE");
+		emit("", "jle", "." + firstLab, "; if " + operand2 + " <= " + operand1 + " then jump to set eax to TRUE");
    }
 	else{
-		emit("", "jle", "." + firstLabel, "; if " + operand1 + " <= " + operand2 + " then jump to set eax to TRUE");
+		emit("", "jle", "." + firstLab, "; if " + operand1 + " <= " + operand2 + " then jump to set eax to TRUE");
    }
 	emit("", "mov", "eax,[FALSE]", "; else set eax to FALSE");
 
@@ -1849,15 +1856,15 @@ void Compiler::emitLessThanOrEqualToCode(string operand1, string operand2) { // 
 		insert("false",BOOLEAN,CONSTANT,"0",YES, 1);
 		symbolTable.at("false").setInternalName("FALSE");
 	}
-	emit("", "jmp", "." + secondLabel, "; unconditionally jump");
-	emit("." + firstLabel + ":");
+	emit("", "jmp", "." + secLab, "; unconditionally jump");
+	emit("." + firstLab + ":");
 	emit("", "mov", "eax,[TRUE]", "; set eax to TRUE");
 
 	if (symbolTable.count("true") == 0) {
 		insert("true",BOOLEAN,CONSTANT, "-1",YES, 1);
 		symbolTable.at("true").setInternalName("TRUE");
 	}
-	emit("." + secondLabel + ":");
+	emit("." + secLab + ":");
 
 	if (isTemporary(operand1)) {
 		freeTemp();
@@ -1873,7 +1880,7 @@ void Compiler::emitLessThanOrEqualToCode(string operand1, string operand2) { // 
 
 void Compiler::emitGreaterThanCode(string operand1, string operand2) {    // op2 > op1 //done
 
-	if (symbolTable.count(operand1) == 0){
+	if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1905,13 +1912,13 @@ void Compiler::emitGreaterThanCode(string operand1, string operand2) {    // op2
 	else{
 		emit("", "cmp", "eax,[" + symbolTable.at(operand2).getInternalName() + "]", "; compare " + operand1 + " and " + operand2);
    }
-	string firstLabel = getLabel(), secondLabel = getLabel();
+	string firstLab = getLabel(), secLab = getLabel();
 
 	if (contentsOfAReg == symbolTable.at(operand2).getInternalName()){
-		emit("", "jg", "." + firstLabel, "; if " + operand2 + " > " + operand1 + " then jump to set eax to TRUE");
+		emit("", "jg", "." + firstLab, "; if " + operand2 + " > " + operand1 + " then jump to set eax to TRUE");
    }
 	else{
-		emit("", "jg", "." + firstLabel, "; if " + operand1 + " > " + operand2 + " then jump to set eax to TRUE");
+		emit("", "jg", "." + firstLab, "; if " + operand1 + " > " + operand2 + " then jump to set eax to TRUE");
    }
 	emit("", "mov", "eax,[FALSE]", "; else set eax to FALSE");
 
@@ -1919,15 +1926,15 @@ void Compiler::emitGreaterThanCode(string operand1, string operand2) {    // op2
 		insert("false", BOOLEAN, CONSTANT, "0", YES, 1);
 		symbolTable.at("false").setInternalName("FALSE");
 	}
-	emit("", "jmp", "." + secondLabel, "; unconditionally jump");
-	emit("." + firstLabel + ":");
+	emit("", "jmp", "." + secLab, "; unconditionally jump");
+	emit("." + firstLab + ":");
 	emit("", "mov", "eax,[TRUE]", "; set eax to TRUE");
 
 	if (symbolTable.count("true") == 0) {
 		insert("true", BOOLEAN, CONSTANT, "-1", YES, 1);
 		symbolTable.at("true").setInternalName("TRUE");
 	}
-	emit("." + secondLabel + ":");
+	emit("." + secLab + ":");
 
 	if (isTemporary(operand1)) {
 		freeTemp();
@@ -1943,7 +1950,7 @@ void Compiler::emitGreaterThanCode(string operand1, string operand2) {    // op2
 
 void Compiler::emitGreaterThanOrEqualToCode(string operand1, string operand2) { // op2 >= op1 //done
 
-	if (symbolTable.count(operand1) == 0){
+	if (symbolTable.find(operand1) == symbolTable.end()){
 		processError("reference to undefined symbol " + operand1);
    }
 	else if (symbolTable.count(operand2) == 0){
@@ -1976,13 +1983,13 @@ void Compiler::emitGreaterThanOrEqualToCode(string operand1, string operand2) { 
 	else{
 		emit("", "cmp", "eax,[" + symbolTable.at(operand2).getInternalName() + "]", "; compare " + operand1 + " and " + operand2);
    }
-	string firstLabel = getLabel(), secondLabel = getLabel();
+	string firstLab = getLabel(), secLab = getLabel();
 
 	if (contentsOfAReg == symbolTable.at(operand2).getInternalName()){
-		emit("", "jge", "." + firstLabel, "; if " + operand2 + " >= " + operand1 + " then jump to set eax to TRUE");
+		emit("", "jge", "." + firstLab, "; if " + operand2 + " >= " + operand1 + " then jump to set eax to TRUE");
    }
 	else{
-		emit("", "jge", "." + firstLabel, "; if " + operand1 + " >= " + operand2 + " then jump to set eax to TRUE");
+		emit("", "jge", "." + firstLab, "; if " + operand1 + " >= " + operand2 + " then jump to set eax to TRUE");
    }
 	emit("", "mov", "eax,[FALSE]", "; else set eax to FALSE");
 
@@ -1990,15 +1997,15 @@ void Compiler::emitGreaterThanOrEqualToCode(string operand1, string operand2) { 
 		insert("false", BOOLEAN, CONSTANT, "0", YES, 1);
 		symbolTable.at("false").setInternalName("FALSE");
 	}
-	emit("", "jmp", "." + secondLabel, "; unconditionally jump");
-	emit("." + firstLabel + ":");
+	emit("", "jmp", "." + secLab, "; unconditionally jump");
+	emit("." + firstLab + ":");
 	emit("", "mov", "eax,[TRUE]", "; set eax to TRUE");
 
 	if (symbolTable.count("true") == 0) {
 		insert("true", BOOLEAN, CONSTANT, "-1", YES, 1);
 		symbolTable.at("true").setInternalName("TRUE");
 	}
-	emit("." + secondLabel + ":");
+	emit("." + secLab + ":");
 
 	if (isTemporary(operand1)) {
 		freeTemp();
