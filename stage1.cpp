@@ -988,40 +988,45 @@ void Compiler::emitStorage() //done
 }
 
 void Compiler::emitReadCode(string operand, string) { //done
-	vector<string> listOperand;
-	//while (name is broken from list (operand) and put in name != "")
-	string currentToken = "";
-	for (auto x : operand) {
-		if (x != ',') {
-			currentToken += x;
-		}
-		else {
-			if (currentToken.length() > 15) {
-				listOperand.push_back(currentToken.substr(0, 15));
-			}
-			else listOperand.push_back(currentToken);
-			currentToken = "";
-		}
-	}
-	listOperand.push_back(currentToken.substr(0, 15));
-	for (auto name : listOperand) {
-		
-		if (symbolTable.find(name) == symbolTable.end()) {
-			processError("Semantic Fail:reference to undefined variable '" + name + "'");
-		}
-		
-		if (symbolTable.at(name).getDataType() != INTEGER) {
-			processError("Semantic Fail:can't read variables of this type: "+ name );
-		}
-		
-		if (symbolTable.at(name).getMode() != VARIABLE) {
-			processError("Semantic Fail:attempting to read to a read-only location: "+ name);
+	string name;
+   for (uint i = 0; i < operand.size(); ++i) {
 
-		}
-		emit("", "call", "ReadInt", "; read int; value placed in eax");
-		emit("", "mov", "[" + symbolTable.at(name).getInternalName() + "],eax", "; store eax at " + name);
-		contentsOfAReg = name;
-	}
+       if (operand[i] != ',' && i < operand.size()) {
+           name += operand[i];
+           continue;
+       }
+
+       if (name != "") {
+           if (symbolTable.count(name) == 0){
+               processError("reference to undefined symbol " + name);
+        }
+           if (symbolTable.at(name).getDataType() != INTEGER){
+               processError("can't read variables of this type");
+        }
+           if (symbolTable.at(name).getMode() != VARIABLE){
+               processError("attempting to read to a read-only location");
+        }
+           emit("", "call", "ReadInt", "; read int; value placed in eax");
+           emit("", "mov", "[" + symbolTable.at(name).getInternalName() + "],eax", "; store eax at " + name);
+           contentsOfAReg = symbolTable.at(name).getInternalName();
+       }
+       name = "";
+   }
+
+   if (name != "") {
+       if (symbolTable.count(name) == 0){
+           processError("reference to undefined symbol " + name);
+     }
+       if (symbolTable.at(name).getDataType() != INTEGER){
+           processError("can't read variables of this type");
+     }
+       if (symbolTable.at(name).getMode() != VARIABLE){
+           processError("attempting to read to a read-only location");
+     }
+       emit("", "call", "ReadInt", "; read int; value placed in eax");
+       emit("", "mov", "[" + symbolTable.at(name).getInternalName() + "],eax", "; store eax at " + name);
+       contentsOfAReg = symbolTable.at(name).getInternalName();
+   }
 }
 
 void Compiler::emitWriteCode(string operand, string) { //done
