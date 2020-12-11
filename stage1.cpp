@@ -75,8 +75,8 @@ void Compiler::createListingTrailer() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// stage 0 production 1 token should be "program"
-void Compiler::prog() {
+// stage 0 production 1
+void Compiler::prog() {  // token should be "program"
 	if (token != "program")
 	{
 		processError("keyword \"program\" expected");
@@ -102,7 +102,6 @@ void Compiler::prog() {
 }
 
 // stage 0 production 2
-
 void Compiler::progStmt() { //token should be "program"
 	string x;
 	if (token != "program")
@@ -124,7 +123,6 @@ void Compiler::progStmt() { //token should be "program"
 }
 
 // stage 0 production 3
-
 void Compiler::consts() {
 	if (token != "const")
 	{
@@ -138,7 +136,6 @@ void Compiler::consts() {
 }
 
 // stage 0 production 4
-
 void Compiler::vars() {
 	if (token != "var")
 	{
@@ -152,7 +149,6 @@ void Compiler::vars() {
 }
 
 // stage 0 production 5
-
 void Compiler::beginEndStmt() {// change as of stage 1
 	if (token != "begin"){
 		processError("keyword \"begin\" expected");
@@ -173,7 +169,6 @@ void Compiler::beginEndStmt() {// change as of stage 1
 }
 
 // stage 0 production 6
-
 void Compiler::constStmts() {
 	string x, y;
 
@@ -234,7 +229,6 @@ void Compiler::constStmts() {
 }
 
 // stage 0 production 7
-
 void Compiler::varStmts() {
   
 	string x,y;
@@ -294,7 +288,8 @@ string Compiler::ids() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void Compiler::execStmts(){       // stage 1, production 2
+// stage 1, production 2
+void Compiler::execStmts(){
  
 	if (isNonKeyId(token) || token == "read" || token == "write" || token == ";" ||  token == "begin")
 	{
@@ -308,7 +303,8 @@ void Compiler::execStmts(){       // stage 1, production 2
    
 }
 
-void Compiler::execStmt() {       // stage 1, production 3 //done
+// stage 1, production 3
+void Compiler::execStmt() {
    	if (isNonKeyId(token))
    	{
 		assignStmt();
@@ -327,7 +323,8 @@ void Compiler::execStmt() {       // stage 1, production 3 //done
    }
 }
 
-void Compiler::assignStmt() {     // stage 1, production 4 //done
+ // stage 1, production 4
+void Compiler::assignStmt() {
 	string secondOperand, firstOperand;
 	if (!isNonKeyId(token))
 	{
@@ -363,7 +360,8 @@ void Compiler::assignStmt() {     // stage 1, production 4 //done
 	code(popOperator(), secondOperand, firstOperand);
 }
 
-void Compiler::readStmt() {       // stage 1, production 5 //done
+// stage 1, production 5
+void Compiler::readStmt() {
 	string x = "";
 	if (nextToken() != "(") 
 	{
@@ -397,7 +395,8 @@ void Compiler::readStmt() {       // stage 1, production 5 //done
 	}
 }
 
-void Compiler::writeStmt() {      // stage 1, production 7 //done
+// stage 1, production 7
+void Compiler::writeStmt() {
 	string x = "";
 	if (nextToken() != "(") 
 	{
@@ -431,7 +430,8 @@ void Compiler::writeStmt() {      // stage 1, production 7 //done
 	}
 }
 
-void Compiler::express() {        // stage 1, production 9 //done
+// stage 1, production 9
+void Compiler::express() {
 	if (token != "(" && !isBoolean(token) && token != "not" && token != "+" && token != "-" && !isInteger(token) && !isNonKeyId(token))
 	{
 		processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", non - keyword identifier or integer expected");
@@ -444,7 +444,8 @@ void Compiler::express() {        // stage 1, production 9 //done
    }
 }
 
-void Compiler::expresses() {      // stage 1, production 10 //done
+// stage 1, production 10
+void Compiler::expresses() {
 	string x = "";
 	string operand1, operand2;
 	if (token != "=" && token != "<" && token != ">" && token != "<>" && token != "<=" && token != ">=" )
@@ -474,7 +475,8 @@ void Compiler::expresses() {      // stage 1, production 10 //done
 	}
 }
 
-void Compiler::term() {           // stage 1, production 11 //done
+// stage 1, production 11
+void Compiler::term() {
 	if (token != "not" && !isBoolean(token) && token != "(" && token != "+"
 		&& token != "-" && !isInteger(token) && !isNonKeyId(token))
 	{
@@ -488,7 +490,8 @@ void Compiler::term() {           // stage 1, production 11 //done
 	}
 }
 
-void Compiler::terms() {          // stage 1, production 12 //done
+// stage 1, production 12
+void Compiler::terms() {
 	string x = "";
 	string operand1, operand2;
 
@@ -518,7 +521,8 @@ void Compiler::terms() {          // stage 1, production 12 //done
 	}
 }
 
-void Compiler::factor() {         // stage 1, production 13 //done
+// stage 1, production 13
+void Compiler::factor() {
 	if (token != "-" && !isInteger(token) && !isNonKeyId(token) && token != "not"
 		&& !isBoolean(token) && token != "(" && token != "+"){
 		processError("\"not\", \"true\", \"false\", \"(\", \"+\", \"-\", integer, or non - keyword identifier expected");
@@ -538,7 +542,8 @@ void Compiler::factor() {         // stage 1, production 13 //done
 	}
 }
 
-void Compiler::factors() {        // stage 1, production 14 //done
+// stage 1, production 14
+void Compiler::factors() {
 	string x = "";
 	string operand1, operand2;
 	if (token != "*"  && token != "mod" && token != "div" && token != "and")
@@ -565,7 +570,8 @@ void Compiler::factors() {        // stage 1, production 14 //done
    }
 }
 
-void Compiler::part() {           // stage 1, production 15 //done
+// stage 1, production 15
+void Compiler::part() {
 	string x = "";
 	if (token == "not")
 	{
@@ -753,7 +759,8 @@ void Compiler::insert(string externalName, storeTypes inType, modes inMode, stri
    }
 }
 
-storeTypes Compiler::whichType(string name) { //tells which data type a name has //done
+//tells which data type a name has
+storeTypes Compiler::whichType(string name) {
    storeTypes type;
    if (isLiteral(name))
    {
@@ -766,7 +773,7 @@ storeTypes Compiler::whichType(string name) { //tells which data type a name has
          type = INTEGER;
       }
    }
-   else //name is an identifier and hopefully a constant
+   else //name is an identifier and constant
    {
       if (symbolTable.find(name) != symbolTable.end()) 
       {
@@ -781,7 +788,8 @@ storeTypes Compiler::whichType(string name) { //tells which data type a name has
    return type;
 }
 
-string Compiler::whichValue(string name) { //tells which value a name has
+//tells which value a name has
+string Compiler::whichValue(string name) {
 	string value;
    if (isLiteral(name)){
       if ( name == "false"){
@@ -792,7 +800,7 @@ string Compiler::whichValue(string name) { //tells which value a name has
          value = name;
       }
    }
-   else //name is an identifier and hopefully a constant
+   else //name is an identifier and constant
    {
       if (symbolTable.count(name) > 0 && symbolTable.at(name).getValue() != "") 
       {
@@ -806,7 +814,7 @@ string Compiler::whichValue(string name) { //tells which value a name has
    return value;
 }
 
-void Compiler::code(string op, string operand1, string operand2) { //done
+void Compiler::code(string op, string operand1, string operand2) {
 	if (op == "program"){
 		emitPrologue(operand1);
    }
@@ -819,13 +827,13 @@ void Compiler::code(string op, string operand1, string operand2) { //done
 	else if (op == "write"){
 		emitWriteCode(operand1);
    }
-	else if (op == "+"){ // this must be binary '+'
+	else if (op == "+"){ // binary plus
 		emitAdditionCode(operand1, operand2);
    }
-	else if (op == "-"){ // this must be binary '-'
+	else if (op == "-"){ // binary minus
 		emitSubtractionCode(operand1, operand2);
    }
-	else if (op == "neg"){ // this must be unary '-'
+	else if (op == "neg"){ // unary minus
 		emitNegationCode(operand1);
    }
 	else if (op == "not"){
@@ -872,12 +880,13 @@ void Compiler::code(string op, string operand1, string operand2) { //done
    }
 }
 
-void Compiler::pushOperator(string name) { // Push name onto opertorStk //done
-	// push name onto stack;
+// Push name onto opertorStk
+void Compiler::pushOperator(string name) {
 	operatorStk.push(name);
 }
 
-string Compiler::popOperator() { // pop name from operandStk //done
+// Pop name from operandStk
+string Compiler::popOperator() {
    string temp;
 	// if operatorStk is not empty
 	// return top element removed from stack;
@@ -894,7 +903,8 @@ string Compiler::popOperator() { // pop name from operandStk //done
    return temp;
 }
 
-void Compiler::pushOperand(string operand) { // Push name onto operandStk //done
+// Push name onto operandStk
+void Compiler::pushOperand(string operand) {
 	//if name is a literal, also create a symbol table entry for it
 
    // if name is a literal and has no symbol table entry
@@ -908,7 +918,8 @@ void Compiler::pushOperand(string operand) { // Push name onto operandStk //done
 	operandStk.push(operand);
 }
 
-string Compiler::popOperand() { //pop name from operandStk //done
+// Pop name from operandStk
+string Compiler::popOperand() {
 	string temp;
 	// if operandStk is not empty
 	// return top element removed from stack;
@@ -926,9 +937,9 @@ string Compiler::popOperand() { //pop name from operandStk //done
 }
 
 
-void Compiler::emit(string label, string instruction, string operands, string comment) //done
+void Compiler::emit(string label, string instruction, string operands, string comment)
 {
-	// Turn on left justification in objectFile
+   // Turn on left justification in objectFile
    // Output label in a field of width 8
    // Output instruction in a field of width 8
    // Output the operands in a field of width 24
@@ -940,7 +951,7 @@ void Compiler::emit(string label, string instruction, string operands, string co
    objectFile << comment << endl;
 }
 
-void Compiler::emitPrologue(string progName, string operand2) //done
+void Compiler::emitPrologue(string progName, string operand2)
 {
 	time_t now = time (NULL); 
    // Output identifying comments at beginning of objectFile
@@ -953,14 +964,14 @@ void Compiler::emitPrologue(string progName, string operand2) //done
    emit("_start:");
 }
 
-void Compiler::emitEpilogue(string operand1, string operand2) //done
+void Compiler::emitEpilogue(string operand1, string operand2)
 {
 	emit("","Exit", "{0}");
    objectFile << endl;
    emitStorage();
 }
 
-void Compiler::emitStorage() //done
+void Compiler::emitStorage()
 {
 	emit("SECTION", ".data");
    // for those entries in the symbolTable that have
@@ -987,7 +998,7 @@ void Compiler::emitStorage() //done
    }
 }
 
-void Compiler::emitReadCode(string operand, string) { //done
+void Compiler::emitReadCode(string operand, string) {
 	string name;
    for (uint i = 0; i < operand.size(); ++i) {
 
@@ -1029,7 +1040,7 @@ void Compiler::emitReadCode(string operand, string) { //done
    }
 }
 
-void Compiler::emitWriteCode(string operand, string) { //done
+void Compiler::emitWriteCode(string operand, string) {
 
    string name;
 	static bool defStor = false;
